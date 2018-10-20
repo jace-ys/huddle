@@ -85,16 +85,13 @@ class HuddleThread(Thread):
                         say_ip()
                         follow_on = False
                         continue
-                if audio:
-                    aiy.audio.play_audio(audio)
+                # if audio:
+                #     aiy.audio.play_audio(audio)
                 self.textquery_flag.clear()
 
 
 def main():
     # start main process
-    # kill video streams
-    subprocess.call('sudo pkill uv4l', shell=True)
-
     # set logging
     logging.basicConfig(level=logging.ERROR)
 
