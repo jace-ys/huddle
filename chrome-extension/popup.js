@@ -12,13 +12,13 @@ huddleButton.addEventListener("click", () => {
   } else {
     startRecording();
     speechRecognition.start();
-    speechRecognition.onend = () => {
-      console.log("Restarting");
-      speechRecognition.start();
-    }
     speechRecognition.onresult = (event) => {
       var speech = event.results[event.results.length-1][0].transcript;
       console.log(speech);
+    }
+    speechRecognition.onspeechend = () => {
+      console.log("Restarting");
+      speechRecognition.start();
     }
   }
 });
