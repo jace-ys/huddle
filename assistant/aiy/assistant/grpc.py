@@ -81,3 +81,32 @@ def get_assistant():
         device = json.load(open("/home/pi/.config/googlesamples-assistant/device_config.json"))
         _assistant_recognizer = _AssistantRecognizer(credentials, device)
     return _assistant_recognizer
+
+class _SpeechRecognizer(object):
+    """Speech recognizer using Google Speech."""
+
+    def __init__(self, credentials, device):
+        self._request = aiy._apis._speech.CloudSpeechRequest(credentials, device)
+        self._recorder = aiy.audio.get_recorder()
+
+    def recognize(self):
+        """Recognizes the user's speech and gets answers from Google Assistant.
+
+        This function listens to the user's speech via the VoiceHat speaker and
+        sends the audio to the Google Assistant Library. The response is returned in
+        both text and audio.
+
+        Usage:
+            transcript, audio = my_recognizer.recognize()
+            if transcript is not None:
+                print('You said ', transcript)
+                aiy.audio.play_audio(audio)
+        """
+        self._request.reset()
+        self._request.set_endpointer_cb(self._endpointer_callback)
+        self._recorder.add_processor(self._request)
+        response = self._request.do_request()
+        return response.request_text, response.response_text, response.response_audio, response.follow_on
+
+    def _endpointer_callback(self):
+        self._recorder.remove_processor(self._request)
