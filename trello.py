@@ -11,10 +11,10 @@ key = "9699a11bcd760a9dd78e59338314e870"
 token = "01aeff8a98124ef0e63130c2c44a34284be6df1f604c427e17b603a3ae78d6b1"
 
 def find_card (task, destination):
-  // Link of serach for trello API
+  # Link of serach for trello API
   url = "https://api.trello.com/1/search"
 
-  // Params of search
+  # Params of search
   querystring = {
     "query":"is:open name:" + task,
     "idBoards":"5bbe266d9eb33189e0c31011",
@@ -24,11 +24,11 @@ def find_card (task, destination):
     "token":token
   }
 
-  // Send HTTP request
+  # Send HTTP request
   response = requests.request("GET", url, params=querystring)
 
   print(response.text)  
-  // Parse the JSON
+  # Parse the JSON
   cards = json.loads(response.text).cards
 
   if (response.cards.length != 0): 
@@ -41,19 +41,19 @@ def find_card (task, destination):
 def update_card(card_id, list_id):
   url = "https://api.trello.com/1/cards" + card_id
 
-  // Params of search
+  # Params of search
   querystring = {
     "idList":list_id,
     "key":key,
     "token":token
   }
-  // Send HTTP request
+  # Send HTTP request
   response = requests.request("PUT", url, params=querystring)
 
 def create_card(task, list_id):
   url = "https://api.trello.com/1/cards"
 
-  // Params of search
+  # Params of search
   querystring = {
     "name":task,
     "idList":list_id,
@@ -61,5 +61,5 @@ def create_card(task, list_id):
     "key":key,
     "token":token
   }
-  // Send HTTP request
+  # Send HTTP request
   response = requests.request("POST", url, params=querystring)
