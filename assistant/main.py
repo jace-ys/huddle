@@ -18,7 +18,7 @@ import aiy.audio
 import aiy.assistant.grpc
 
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.WARNING,
     format="[%(asctime)s] %(levelname)s:%(name)s:%(message)s"
 )
 
@@ -59,6 +59,7 @@ class HuddleThread(Thread):
     def run(self):
         assistant = aiy.assistant.grpc.get_assistant()
         button = aiy.voicehat.get_button()
+        first_run = True
         time.sleep(3)
         self.textquery = "Talk to Huddle"
         with aiy.audio.get_recorder():
@@ -68,11 +69,14 @@ class HuddleThread(Thread):
                     req_text, resp_text, audio, follow_on = assistant.recognize(self.textquery)
                     self.textquery = None
                 else:
-                    button.wait_for_press()
+                    if first_run:
+                        button.wait_for_press()
+                        first_run = False
                     print("Listening")
                     req_text, resp_text, audio, follow_on = assistant.recognize()
                 if req_text:
                     print("Team: " + req_text)
+                if resp_text:
                     print("Huddle: " + resp_text)
                     if req_text == 'shut down':
                         power_off_pi()
