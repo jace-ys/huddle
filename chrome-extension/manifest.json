@@ -10,5 +10,5 @@
     "page_action": {
       "default_popup": "huddle_popup.html"
     },
-    "permissions": ["activeTab", "declarativeContent", "desktopCapture"]
+    "permissions": ["activeTab", "declarativeContent"]
   }

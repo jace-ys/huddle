@@ -3,15 +3,24 @@
   <head>
     <meta charset="utf-8">
     <title>Huddle App</title>
-    <link rel="stylesheet" type="text/css" href="./lib/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="lib/css/bootstrap.min.css">
+    <style>
+      body {
+        padding: 15px;
+      }
+    </style>
   </head>
   <body>
-    <h4>Huddle App</h4>
-    <h6><span id="rec-status"></span></h6>
-    <button class="btn-danger rec-inactive" type="button" id="huddle-button">Start Huddle Session</button>
+    <div class="text-center">
+      <h4>Huddle Board</h4>
+      <canvas id="huddle-canvas" width="300" height="300" keepalive="true"></canvas>
+      <button id="pin-canvas" class="btn-danger" type="button">Pin Canvas</button>
+    </div>
 
-    <script src="./lib/js/jquery-3.3.1.slim.min.js" type="text/javascript"></script>
-    <script src="./lib/js/bootstrap.min.js" type="text/javascript"></script>
+    <script src="lib/js/paper-core.min.js"></script>
+    <script src="popup.js" type="text/javascript"></script>
+    <script src="lib/js/jquery-3.3.1.slim.min.js" type="text/javascript"></script>
+    <script src="lib/js/bootstrap.min.js" type="text/javascript"></script>
     <script src="popup.js"></script>
   </body>
 </html>

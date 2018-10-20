@@ -1,38 +1,64 @@
-let huddleButton = document.querySelector("#huddle-button");
-let recordingStatus = document.querySelector("#rec-status");
-let speechRecognition = new webkitSpeechRecognition();
-speechRecognition.lang = "en-US";
-speechRecognition.continuous = true;
-speechRecognition.interimResults = false;
+paper.install(window);
+window.onload = function() {
+  var canvas = $("#huddle-canvas")[0];
+  var pinCanvas = $("#pin-canvas");
+  const context = canvas.getContext('2d');
 
-huddleButton.addEventListener("click", () => {
-  if (huddleButton.classList.contains("rec-active")) {
-    stopRecording();
-    speechRecognition.stop();
-  } else {
-    startRecording();
-    speechRecognition.start();
-    speechRecognition.onresult = (event) => {
-      var speech = event.results[event.results.length-1][0].transcript;
-      console.log(speech);
-    }
-    speechRecognition.onspeechend = () => {
-      console.log("Restarting");
-      speechRecognition.start();
-    }
+  // Paper.js
+  paper.setup("huddle-canvas");
+  var tool = new Tool();
+  var path;
+
+  tool.onMouseDown = function(event) {
+    path = new Path();
+    path.strokeColor = "red";
+    path.strokeWidth = 3;
+    path.add(event.point);
   }
-});
 
-function stopRecording() {
-  huddleButton.classList.replace("rec-active", "rec-inactive");
-  huddleButton.classList.replace("btn-success", "btn-danger");
-  huddleButton.innerHTML = "Start Huddle Session";
-  recordingStatus.innerHTML = "";
-}
+  tool.onMouseDrag = function(event) {
+    path.add(event.point);
+  }
 
-function startRecording() {
-  huddleButton.classList.replace("rec-inactive", "rec-active");
-  huddleButton.classList.replace("btn-danger", "btn-success");
-  huddleButton.innerHTML = "Stop Huddle Session";
-  recordingStatus.innerHTML = "Recording..";
+  pinCanvas.on("click", () => {
+    canvas.toBlob(blob => {
+      pinImageToTrello(blob);
+    });
+    project.clear();
+  });
+
+  async function pinImageToTrello(blob) {
+    const KEY = "9699a11bcd760a9dd78e59338314e870";
+    const TOKEN = "01aeff8a98124ef0e63130c2c44a34284be6df1f604c427e17b603a3ae78d6b1";
+    let response = await fetch("https://api.trello.com/1/cards?name=" + "Drawing" + "&idList=" + "5bcba3b2a8e0c8373c67eea1" + "&key=" + KEY + "&token=" + TOKEN, {
+      method: "POST",
+    });
+    response.json().then(card => {
+      createAndSendForm(blob, card.id);
+    });
+  }
+
+  const createAndSendForm = function(file, cardId) {
+    var formData = new FormData();
+    formData.append("key", "9699a11bcd760a9dd78e59338314e870");
+    formData.append("token", "01aeff8a98124ef0e63130c2c44a34284be6df1f604c427e17b603a3ae78d6b1");
+    formData.append("file", file);
+    formData.append("mimeType", "image/jpeg");
+    formData.append("name", "My Awesome File");
+    var request = createRequest(cardId);
+    request.send(formData);
+  }
+
+  const createRequest = function(cardId) {
+    var request = new XMLHttpRequest();
+    request.onreadystatechange = function() {
+      // When we have a response back from the server we want to share it!
+      // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/response
+      if (request.readyState === 4) {
+        console.log(`Successfully uploaded at: ${request.response.date}`);
+      }
+    }
+    request.open("POST", `https://api.trello.com/1/cards/${cardId}/attachments/`);
+    return request;
+  }
 }
