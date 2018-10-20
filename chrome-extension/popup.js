@@ -2,7 +2,8 @@ paper.install(window);
 window.onload = function() {
   var canvas = $("#huddle-canvas")[0];
   var pinCanvas = $("#pin-canvas");
-  const context = canvas.getContext('2d');
+  var clearCanvas = $("#clear-canvas");
+  const context = canvas.getContext("2d");
 
   // Paper.js
   paper.setup("huddle-canvas");
@@ -24,6 +25,10 @@ window.onload = function() {
     canvas.toBlob(blob => {
       pinImageToTrello(blob);
     });
+    project.clear();
+  });
+
+  clearCanvas.on("click", () =>  {
     project.clear();
   });
 
