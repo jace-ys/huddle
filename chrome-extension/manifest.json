@@ -3,8 +3,12 @@
     "name": "Huddle Chrome Extension",
     "description": "Chrome Extension for Huddle",
     "version": "1.0",
-    "browser_action": {
+    "background": {
+      "scripts": ["background.js"],
+      "persistant": false
+    },
+    "page_action": {
       "default_popup": "huddle_popup.html"
     },
-    "permissions": ["activeTab"]
+    "permissions": ["activeTab", "declarativeContent", "desktopCapture"]
   }
