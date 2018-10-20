@@ -13,7 +13,6 @@ import time
 from gpiozero import Button
 from queue import Queue
 
-import aiy.assistant.auth_helpers
 import aiy.voicehat
 import aiy.audio
 import aiy.assistant.grpc
@@ -24,7 +23,6 @@ logging.basicConfig(
 )
 
 # initialise instances of app objects
-creds = aiy.assistant.auth_helpers.get_assistant_credentials()
 msg_queue = Queue()
 
 
