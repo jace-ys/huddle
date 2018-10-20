@@ -58,11 +58,9 @@ class HuddleThread(Thread):
 
     def run(self):
         assistant = aiy.assistant.grpc.get_assistant()
-        follow_on = True
-        global BUTTON_TRIGGERED
+        button = aiy.voicehat.get_button()
         time.sleep(3)
         self.textquery = "Talk to Huddle"
-        # get medicine times
         with aiy.audio.get_recorder():
             while not self.shutdown_flag.is_set():
                 print("Ready")
@@ -70,6 +68,7 @@ class HuddleThread(Thread):
                     req_text, resp_text, audio, follow_on = assistant.recognize(self.textquery)
                     self.textquery = None
                 else:
+                    button.wait_for_press()
                     print("Listening")
                     req_text, resp_text, audio, follow_on = assistant.recognize()
                 if req_text:
@@ -99,8 +98,8 @@ def main():
     signal.signal(signal.SIGINT, signal_handler)
 
     # start threads
-    yogi_thread = HuddleThread(msg_queue)
-    yogi_thread.start()
+    huddle_thread = HuddleThread(msg_queue)
+    huddle_thread.start()
 
 if __name__ == '__main__':
     main()
