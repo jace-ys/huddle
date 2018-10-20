@@ -22,29 +22,32 @@ var lists = [{}];
 var card_ready = false;
 var list_ready = false;
 
-xhttp = new XMLHttpRequest();
-xhttp.onreadystatechange = function() {
-  if (this.readyState == 4 && this.status == 200) {
-    cards = JSON.parse(this.responseText);
-    card_ready = true;
-  }
-};
-// Open Connection
-xhttp.open("GET", "https://api.trello.com/1/boards/" + process.env.BOARD_ID + "/cards?fields=name,id&" + api_key_str , true);
-// Send the HTTP request
-xhttp.send();
+function loadLists() {
+  xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      cards = JSON.parse(this.responseText);
+      card_ready = true;
+    }
+  };
+  // Open Connection
+  xhttp.open("GET", "https://api.trello.com/1/boards/" + process.env.BOARD_ID + "/cards?fields=name,id&" + api_key_str , true);
+  // Send the HTTP request
+  xhttp.send();
 
-xhttp1 = new XMLHttpRequest();
-xhttp1.onreadystatechange = function() {
-  if (this.readyState == 4 && this.status == 200) {
-    lists = JSON.parse(this.responseText);
-    list_ready = true;
-  }
-};
-// Open Connection
-xhttp1.open("GET", "https://api.trello.com/1/boards/" + process.env.BOARD_ID + "/lists?" + api_key_str , true);
-// Send the HTTP request
-xhttp1.send();
+  xhttp1 = new XMLHttpRequest();
+  xhttp1.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      lists = JSON.parse(this.responseText);
+      list_ready = true;
+    }
+  };
+  // Open Connection
+  xhttp1.open("GET", "https://api.trello.com/1/boards/" + process.env.BOARD_ID + "/lists?" + api_key_str , true);
+  // Send the HTTP request
+  xhttp1.send();
+}
+loadLists();
 
 app.post('/api/update', function(req, res) {
   while (!(card_ready && list_ready)) {
@@ -68,6 +71,7 @@ app.post('/api/update', function(req, res) {
           xhttp.open("PUT", "https://api.trello.com/1/cards/" + cards[i]["id"] + "?idList=" + lists[j]["id"] + "&" + api_key_str , true);
           // Send the HTTP request
           xhttp.send();
+          loadLists();
           res.send(200);
         }
         break;
@@ -84,6 +88,7 @@ app.post('/api/update', function(req, res) {
             xhttp2.open("PUT", "https://api.trello.com/1/cards/" + cards[i]["id"] + "?idList=" + response["id"] + "&" + api_key_str , true);
             // Send the HTTP request
             xhttp2.send();
+            loadLists();
             res.send(200);
           }
         };
@@ -105,6 +110,7 @@ app.post('/api/update', function(req, res) {
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function() {
           if (this.readyState == 4 && this.status == 200) {
+            loadLists();
             res.send(200);
           }
         };
@@ -124,6 +130,7 @@ app.post('/api/update', function(req, res) {
           var xhttp2 = new XMLHttpRequest();
           xhttp2.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
+              loadLists();
               res.send(200);
             }
           };
@@ -139,4 +146,13 @@ app.post('/api/update', function(req, res) {
       xhttp1.send();
     }
   }
+});
+
+app.post('/api/add-due-date', function(req, res) {
+  while (!(card_ready && list_ready)) {
+
+  }
+  var task = req.body.task;
+  var date = req.body.date;
+
 });
