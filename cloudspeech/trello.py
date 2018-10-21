@@ -10,14 +10,14 @@ map_id = {
 }
 
 map_member = {
-    "Rachel": "racheltan46",
-    "rachel": "racheltan46",
-    "Mark": "markgee15",
-    "mark": "markgee15",
-    "Jace": "jaceys",
-    "jace": "jaceys",
-    "Joan": "joan82950989",
-    "joan": "joan82950989",
+    "Rachel": "5bb699ba52c2ff0433d2d70b",
+    "rachel": "5bb699ba52c2ff0433d2d70b",
+    "Mark": "5b70e363e51b481792ebef7c",
+    "mark": "5b70e363e51b481792ebef7c",
+    "Jace": "5b2a8b92d443055bce5e1517",
+    "jace": "5b2a8b92d443055bce5e1517",
+    "Joan": "5bb347f591731d3c5fd84717",
+    "joan": "5bb347f591731d3c5fd84717",
     "": None
 }
 
@@ -32,9 +32,9 @@ def find_card (term, card_title, destination, due_date, member):
   querystring = {
     "query":"is:open name:"+term,
     "partial":"true",
-    # "idBoards":"5bbe266d9eb33189e0c31011",
-    # "modelTypes":"cards",
-    # "card_fields":"name,id"
+    "idBoards":"5bbe266d9eb33189e0c31011",
+    "modelTypes":"cards",
+    "card_fields":"name,id",
     "key":key,
     "token":token
   }
@@ -42,7 +42,7 @@ def find_card (term, card_title, destination, due_date, member):
   # Send HTTP request
   response = requests.request("GET", url, params=querystring)
 
-  print(response.text)
+  # print(response.text)
   # Parse the JSON
   cards = json.loads(response.text)["cards"]
 
@@ -71,13 +71,12 @@ def update_card(card_id, card_title, list_id, due_date, member_id):
   if (due_date != ""):
     querystring["due"] = due_date
   if (member_id):
-    print(member_id)
     querystring["idMembers"] = member_id
 
-  print(querystring)
+  # print(querystring)
   # Send HTTP request
   response = requests.request("PUT", url, params=querystring)
-  print(response)
+  # print(response)
 
 def create_card(card_title, list_id, due_date, member_id):
   url = "https://api.trello.com/1/cards"

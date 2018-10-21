@@ -23,7 +23,7 @@ import vlc
 import dialogflow_v2 as dialogflow
 session_client = dialogflow.SessionsClient()
 
-session = session_client.session_path('project-huddle', '12')
+session = session_client.session_path('project-huddle', '241')
 print('Session path: {}\n'.format(session))
 
 previous_final_transcript = ""
@@ -186,7 +186,7 @@ def detect_intent_texts(texts, language_code):
 
         intent = response.query_result.intent.display_name
         # print(response)
-        print("Intent: " + intent)
+        # print("Intent: " + intent)
         if intent == "Default Welcome Intent":
             print("Hello! I am Huddle, your team's virtual secretary. I'll be transcribing this meeting so talk away!")
             return
@@ -219,14 +219,14 @@ def detect_intent_texts(texts, language_code):
                     search = proglang[0]
                 else:
                     search = verb[0]
-                print(card_title)
+                # print(card_title)
                 if (sub_intent == "to-do" or sub_intent == "doing" or sub_intent == "done"):
                     destination = sub_intent
                     Thread(target=trello.find_card, args=([search, card_title, destination, "", ""])).start()
                     return
                 elif (sub_intent == "add-member"):
                     name = parameters["name"]
-                    print(card_title)
+                    # print(card_title)
                     Thread(target=trello.find_card, args=([search, card_title, "", "", name])).start()
                     return
                 elif (sub_intent == "add-duedate"):
@@ -267,9 +267,9 @@ def detect_intent_texts(texts, language_code):
 
 def main():
     global running
-    # p = vlc.MediaPlayer("./output.mp3")
-    # p.play()
-    # time.sleep(7)
+    p = vlc.MediaPlayer("./output.mp3")
+    p.play()
+    time.sleep(7)
     # See http://g.co/cloud/speech/docs/languages
     # for a list of supported languages.
     language_code = 'en-US'  # a BCP-47 language tag
