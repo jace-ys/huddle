@@ -23,7 +23,7 @@ import vlc
 import dialogflow_v2 as dialogflow
 session_client = dialogflow.SessionsClient()
 
-session = session_client.session_path('project-huddle', '241')
+session = session_client.session_path('project-huddle', '244511')
 print('Session path: {}\n'.format(session))
 
 previous_final_transcript = ""
@@ -231,6 +231,7 @@ def detect_intent_texts(texts, language_code):
                     return
                 elif (sub_intent == "add-duedate"):
                     date = parameters["date"]
+                    search = verb[0]
                     # print(card_title)
                     Thread(target=trello.find_card, args=([search, card_title, "", date, ""])).start()
                     return
