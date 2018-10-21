@@ -10,10 +10,11 @@ window.onload = function() {
   paper.setup("huddle-canvas");
   var tool = new Tool();
   var path;
+  var color = "red";
 
   tool.onMouseDown = function(event) {
     path = new Path();
-    path.strokeColor = "red";
+    path.strokeColor = color;
     path.strokeWidth = 3;
     path.add(event.point);
   }
@@ -27,6 +28,22 @@ window.onload = function() {
       pinImageToTrello(blob);
     });
     project.clear();
+  });
+
+  $("#black").on("click", () => {
+    color = "black";
+  });
+
+  $("#red").on("click", () => {
+    color = "red";
+  });
+
+  $("#green").on("click", () => {
+    color = "green";
+  });
+
+  $("#blue").on("click", () => {
+    color = "blue";
   });
 
   clearCanvas.on("click", () =>  {
