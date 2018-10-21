@@ -1,25 +1,40 @@
 import requests
 import json
+import urllib
 
 map_id = {
   "to-do": '5bbe27fb23dadc12a98e2cb6',
   "doing": '5bca6606e9755b36abcd041e',
-  "done": '5bbe28035d22ed6a690fdabe'
+  "done": '5bbe28035d22ed6a690fdabe',
+  "": None
+}
+
+map_member = {
+    "Rachel": "racheltan46",
+    "rachel": "racheltan46",
+    "Mark": "markgee15",
+    "mark": "markgee15",
+    "Jace": "jaceys",
+    "jace": "jaceys",
+    "Joan": "joan82950989",
+    "joan": "joan82950989",
+    "": None
 }
 
 key = "9699a11bcd760a9dd78e59338314e870"
 token = "01aeff8a98124ef0e63130c2c44a34284be6df1f604c427e17b603a3ae78d6b1"
 
-def find_card (task, destination):
+def find_card (term, card_title, destination, due_date, member):
   # Link of serach for trello API
   url = "https://api.trello.com/1/search"
 
   # Params of search
   querystring = {
-    "query":"is:open name:" + task,
-    "idBoards":"5bbe266d9eb33189e0c31011",
-    "modelTypes":"cards",
-    "card_fields":"name,id",
+    "query":"is:open name:"+term,
+    "partial":"true",
+    # "idBoards":"5bbe266d9eb33189e0c31011",
+    # "modelTypes":"cards",
+    # "card_fields":"name,id"
     "key":key,
     "token":token
   }
@@ -27,39 +42,63 @@ def find_card (task, destination):
   # Send HTTP request
   response = requests.request("GET", url, params=querystring)
 
+  print(response.text)
   # Parse the JSON
   cards = json.loads(response.text)["cards"]
 
-  if (len(cards) != 0): 
+  if (len(cards) != 0):
     card_id = cards[0]["id"]
-    update_card(card_id, map_id[destination])
+    # print("found card")
+    update_card(card_id, card_title, map_id[destination], due_date, map_member[member])
   else:
-    create_card(task, map_id[destination])
+    # print("card not found")
+    create_card(card_title, map_id[destination], due_date, map_member[member])
     card_id = "not found"
 
-def update_card(card_id, list_id):
+def update_card(card_id, card_title, list_id, due_date, member_id):
   url = "https://api.trello.com/1/cards/" + card_id
 
   # Params of search
   querystring = {
-    "idList":list_id,
+    "name": card_title,
     "key":key,
     "token":token
   }
+
+  # Set custom params
+  if (list_id):
+    querystring["idList"] = list_id
+  if (due_date != ""):
+    querystring["due"] = due_date
+  if (member_id):
+    print(member_id)
+    querystring["idMembers"] = member_id
+
+  print(querystring)
   # Send HTTP request
   response = requests.request("PUT", url, params=querystring)
   print(response)
 
-def create_card(task, list_id):
+def create_card(card_title, list_id, due_date, member_id):
   url = "https://api.trello.com/1/cards"
 
   # Params of search
   querystring = {
-    "name":task,
-    "idList":list_id,
+    "name":card_title,
     "keepFromSourc":"all",
     "key":key,
     "token":token
   }
+
+  # Set custom params
+  if (list_id):
+    querystring["idList"] = list_id
+  if (due_date != ""):
+    querystring["due"] = due_date
+  if (member_id):
+    querystring["idMembers"] = member_id
+
+  # print(querystring)
   # Send HTTP request
   response = requests.request("POST", url, params=querystring)
+  # print(response)

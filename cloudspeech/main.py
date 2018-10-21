@@ -17,18 +17,23 @@ from google.cloud.language import enums as language_enums
 from google.cloud.language import types as language_types
 
 import trello
+import vlc
 
 # Instantiates a client
 import dialogflow_v2 as dialogflow
 session_client = dialogflow.SessionsClient()
 
-session = session_client.session_path('project-huddle', 'abcd')
+session = session_client.session_path('project-huddle', '12')
 print('Session path: {}\n'.format(session))
+
+previous_final_transcript = ""
+document = ""
 
 # Audio recording parameters
 RATE = 16000
 CHUNK = int(RATE / 10)  # 100ms
 
+running = True
 
 class MicrophoneStream(object):
     """Opens a recording stream as a generator yielding the audio chunks."""
@@ -119,7 +124,12 @@ def listen_print_loop(responses):
     final one, print a newline to preserve the finalized transcription.
     """
     num_chars_printed = 0
+    started = time.time()
+    transcript = ""
+    global previous_final_transcript 
+    END_OF_SINGLE_UTTERANCE = types.StreamingRecognizeResponse.SpeechEventType.Value('END_OF_SINGLE_UTTERANCE')
     for response in responses:
+        # print(response)
         if not response.results:
             continue
 
@@ -148,12 +158,16 @@ def listen_print_loop(responses):
 
         else:
             print(transcript + overwrite_chars)
+            previous_final_transcript = transcript
+            if "goodbye" in transcript:
+                global running
+                running = False
+                break
             Thread(target=detect_intent_texts, args=([[transcript], 'en-US'])).start()
             break
-        
-        END_OF_SINGLE_UTTERANCE = types.StreamingRecognizeResponse.SpeechEventType.Value('END_OF_SINGLE_UTTERANCE')
         if response.speech_event_type == END_OF_SINGLE_UTTERANCE:
             break
+    return 
 
 def detect_intent_texts(texts, language_code):
     """Returns the result of detect intent with texts as inputs.
@@ -166,25 +180,96 @@ def detect_intent_texts(texts, language_code):
             text=text, language_code=language_code)
 
         query_input = dialogflow.types.QueryInput(text=text_input)
-
+        # print(query_input)
         response = session_client.detect_intent(
             session=session, query_input=query_input)
 
         intent = response.query_result.intent.display_name
+        # print(response)
         print("Intent: " + intent)
-        if intent != "Default Fallback Intent":
-            if intent.startswith("discuss-task"):
-                task = response.query_result.output_contexts[0].parameters["task"]
-                destination = intent[14:]
+        if intent == "Default Welcome Intent":
+            print("Hello! I am Huddle, your team's virtual secretary. I'll be transcribing this meeting so talk away!")
+            return
+        elif intent == "Default Fallback Intent":
+            return
+        elif intent.startswith("discuss-task"):
+            sub_intent = intent[14:]
+            if sub_intent == "":
+                return
             else:
-                task = response.query_result.parameters["task"]
-                destination = intent
-            print("Task: " + task)
-            print("Destination: " + destination)
-            Thread(target=trello.find_card, args=([task, destination])).start()
+                parameters = response.query_result.output_contexts[0].parameters
+                # print(parameters)
+                verb = parameters["verb"]
+                terms = parameters["terms"]
+                tools = parameters["tools"]
+                proglang = parameters["proglang"]
+                tools.extend(proglang)
+                title_tools_proglang = ", ".join(tools)
+                title_verb = ", ".join(verb)
+                title_terms = ", ".join(terms)
+                delimiter = ""
+                if (len(tools) > 0 or len(proglang) > 0):
+                    delimiter = ": "
+                card_title = title_tools_proglang + delimiter + title_verb + " " + title_terms
+                if (len(terms) > 0):
+                    search = terms[0]
+                elif (len(tools) > 0):
+                    search = tools[0]
+                elif (len(proglang) > 0):
+                    search = proglang[0]
+                else:
+                    search = verb[0]
+                print(card_title)
+                if (sub_intent == "to-do" or sub_intent == "doing" or sub_intent == "done"):
+                    destination = sub_intent
+                    Thread(target=trello.find_card, args=([search, card_title, destination, "", ""])).start()
+                    return
+                elif (sub_intent == "add-member"):
+                    name = parameters["name"]
+                    print(card_title)
+                    Thread(target=trello.find_card, args=([search, card_title, "", "", name])).start()
+                    return
+                elif (sub_intent == "add-duedate"):
+                    date = parameters["date"]
+                    # print(card_title)
+                    Thread(target=trello.find_card, args=([search, card_title, "", date, ""])).start()
+                    return
+                else:
+                    return
+        else:
+            parameters = response.query_result.parameters
+            # print(parameters)
+            verb = parameters["verb"]
+            terms = parameters["terms"]
+            tools = parameters["tools"]
+            proglang = parameters["proglang"]
+            if (len(terms) > 0):
+                search = terms[0]
+            elif (len(tools) > 0):
+                search = tools[0]
+            elif (len(proglang) > 0):
+                search = proglang[0]
+            else:
+                search = verb[0]
+            tools.extend(proglang)
+            title_tools_proglang = ", ".join(tools)
+            title_verb = ", ".join(verb)
+            title_terms = ", ".join(terms)
+            delimiter = ""
+            if (len(tools) > 0 or len(proglang) > 0):
+                delimiter = ": "
+            card_title = title_tools_proglang + delimiter + title_verb + " " + title_terms
+            destination = intent
+            # print(card_title)
+            Thread(target=trello.find_card, args=([search, card_title, destination, "", ""])).start()
+            return
         
 
 def main():
+    global running
+    # p = vlc.MediaPlayer("./output.mp3")
+    # p.play()
+    # time.sleep(7)
     # See http://g.co/cloud/speech/docs/languages
     # for a list of supported languages.
     language_code = 'en-US'  # a BCP-47 language tag
@@ -201,8 +286,7 @@ def main():
 
     with MicrophoneStream(RATE, CHUNK) as stream:
         audio_generator = stream.generator()
-        while True:
-            print("Listening")
+        while running:
             stream.reset()
             audio_generator = stream.generator()
             requests = (types.StreamingRecognizeRequest(audio_content=content)
