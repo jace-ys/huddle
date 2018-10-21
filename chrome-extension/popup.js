@@ -30,6 +30,10 @@ window.onload = function() {
     project.clear();
   });
 
+  $("#white").on("click", () => {
+    color = "white";
+  });
+
   $("#black").on("click", () => {
     color = "black";
   });
