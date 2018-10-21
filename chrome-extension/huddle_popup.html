@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Huddle App</title>
+    <link rel="stylesheet" type="text/css" href="lib/css/bootstrap.min.css">
+    <style>
+      body {
+        padding: 15px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="text-center">
+      <h4>Huddle Board</h4>
+      <canvas id="huddle-canvas" width="300" height="300" keepalive="true"></canvas>
+      <form class="mb-2 inline-form">
+        <label for="drawing">Name: </label>
+        <input id="name-input" type="text" name="drawing">
+      </form>
+      <button id="pin-canvas" class="btn-danger" type="button">Pin Canvas</button>
+      <button id="clear-canvas" class="btn-warning" type="button">Clear Canvas</button>
+    </div>
+
+    <script src="lib/js/paper-core.min.js"></script>
+    <script src="popup.js" type="text/javascript"></script>
+    <script src="lib/js/jquery-3.3.1.slim.min.js" type="text/javascript"></script>
+    <script src="lib/js/bootstrap.min.js" type="text/javascript"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>
