@@ -3,6 +3,7 @@ window.onload = function() {
   var canvas = $("#huddle-canvas")[0];
   var pinCanvas = $("#pin-canvas");
   var clearCanvas = $("#clear-canvas");
+  var nameInput = $("#name-input");
   const context = canvas.getContext("2d");
 
   // Paper.js
@@ -29,17 +30,20 @@ window.onload = function() {
   });
 
   clearCanvas.on("click", () =>  {
+    nameInput.val("");
     project.clear();
   });
 
   async function pinImageToTrello(blob) {
+    console.log(nameInput.val());
     const KEY = "9699a11bcd760a9dd78e59338314e870";
     const TOKEN = "01aeff8a98124ef0e63130c2c44a34284be6df1f604c427e17b603a3ae78d6b1";
-    let response = await fetch("https://api.trello.com/1/cards?name=" + "Drawing" + "&idList=" + "5bcba3b2a8e0c8373c67eea1" + "&key=" + KEY + "&token=" + TOKEN, {
+    let response = await fetch("https://api.trello.com/1/cards?name=" + nameInput.val() + "&idList=" + "5bcba3b2a8e0c8373c67eea1" + "&key=" + KEY + "&token=" + TOKEN, {
       method: "POST",
     });
     response.json().then(card => {
       createAndSendForm(blob, card.id);
+      nameInput.val("");
     });
   }
 
@@ -49,7 +53,7 @@ window.onload = function() {
     formData.append("token", "01aeff8a98124ef0e63130c2c44a34284be6df1f604c427e17b603a3ae78d6b1");
     formData.append("file", file);
     formData.append("mimeType", "image/jpeg");
-    formData.append("name", "My Awesome File");
+    formData.append("name", "New Drawing");
     var request = createRequest(cardId);
     request.send(formData);
   }
