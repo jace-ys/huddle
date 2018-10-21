@@ -10,14 +10,14 @@ map_id = {
 }
 
 map_member = {
-    "Rachel": "racheltan46",
-    "rachel": "racheltan46",
-    "Mark": "markgee15",
-    "mark": "markgee15",
-    "Jace": "jaceys",
-    "jace": "jaceys",
-    "Joan": "joan82950989",
-    "joan": "joan82950989",
+    "Rachel": "5bb699ba52c2ff0433d2d70b",
+    "rachel": "5bb699ba52c2ff0433d2d70b",
+    "Mark": "5b70e363e51b481792ebef7c",
+    "mark": "5b70e363e51b481792ebef7c",
+    "Jace": "5b2a8b92d443055bce5e1517",
+    "jace": "5b2a8b92d443055bce5e1517",
+    "Joan": "5bb347f591731d3c5fd84717",
+    "joan": "5bb347f591731d3c5fd84717",
     "": None
 }
 
