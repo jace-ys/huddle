@@ -7,10 +7,17 @@ map_id = {
   "done": '5bbe28035d22ed6a690fdabe'
 }
 
+map_member = {
+    "rachel": "racheltan46",
+    "mark": "markgee15",
+    "jace": "jaceys",
+    "joan": "joan82950989"
+}
+
 key = "9699a11bcd760a9dd78e59338314e870"
 token = "01aeff8a98124ef0e63130c2c44a34284be6df1f604c427e17b603a3ae78d6b1"
 
-def find_card (task, destination):
+def find_card (task, destination, due_date, member):
   # Link of serach for trello API
   url = "https://api.trello.com/1/search"
 
@@ -27,39 +34,53 @@ def find_card (task, destination):
   # Send HTTP request
   response = requests.request("GET", url, params=querystring)
 
-  print(response.text)  
+  print(response.text)
   # Parse the JSON
   cards = json.loads(response.text).cards
 
-  if (response.cards.length != 0): 
-    card_id = response.cards[0].id
-    update_card(card_id, map_id[destination])
+  if (len(cards) != 0):
+    card_id = cards[0]["id"]
+    update_card(card_id, map_id[destination], due_date, map_member[member])
   else:
-    create_card(task, map_id[destination])
+    create_card(task, map_id[destination], due_date, map_member[member])
     card_id = "not found"
 
-def update_card(card_id, list_id):
-  url = "https://api.trello.com/1/cards" + card_id
+def update_card(card_id, list_id, due_date, member_id):
+  url = "https://api.trello.com/1/cards/" + card_id
 
   # Params of search
   querystring = {
-    "idList":list_id,
     "key":key,
     "token":token
   }
+
+  # Set custom params
+  if (not list_id):
+    querystring["idList"] = list_id
+  if (due_date != ""):
+    querystring["due"] = list_id
+  if (not member_id):
+    querystring["idMembers"] = member_id
   # Send HTTP request
   response = requests.request("PUT", url, params=querystring)
 
-def create_card(task, list_id):
+def create_card(task, list_id, due_date, member_id):
   url = "https://api.trello.com/1/cards"
 
   # Params of search
   querystring = {
     "name":task,
-    "idList":list_id,
     "keepFromSourc":"all",
     "key":key,
     "token":token
   }
+
+  # Set custom params
+  if (not list_id):
+    querystring["idList"] = list_id
+  if (due_date != ""):
+    querystring["due"] = list_id
+  if (not member_id):
+    querystring["idMembers"] = member_id
   # Send HTTP request
   response = requests.request("POST", url, params=querystring)
