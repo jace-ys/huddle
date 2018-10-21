@@ -42,12 +42,24 @@ window.onload = function() {
     color = "red";
   });
 
+  $("#orange").on("click", () => {
+    color = "orange";
+  });
+
+  $("#yellow").on("click", () => {
+    color = "yellow";
+  });
+
   $("#green").on("click", () => {
     color = "green";
   });
 
   $("#blue").on("click", () => {
     color = "blue";
+  });
+
+  $("#purple").on("click", () => {
+    color = "purple";
   });
 
   clearCanvas.on("click", () =>  {
