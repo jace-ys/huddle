@@ -21,9 +21,6 @@ map_member = {
     "": None
 }
 
-key = "9699a11bcd760a9dd78e59338314e870"
-token = "01aeff8a98124ef0e63130c2c44a34284be6df1f604c427e17b603a3ae78d6b1"
-
 def find_card (term, card_title, destination, due_date, member):
   # Link of serach for trello API
   url = "https://api.trello.com/1/search"
